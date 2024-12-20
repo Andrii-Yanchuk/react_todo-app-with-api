@@ -1,15 +1,18 @@
-/* eslint-disable max-len */
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Todo } from './types/Todo';
 import { FilterType } from './types/FilterType';
 import { Errors } from './types/ErrorType';
-import { TodoItem } from './components/TodoItem';
+import { TodoList } from './components/TodoList';
 import { TodoFooter } from './components/TodoFooter';
 import { TodoHeader } from './components/TodoHeader';
 import { ErrorNotification } from './components/ErrorNotification';
-import { getTodos, addTodo, USER_ID, deleteTodo } from './api/todos';
+import {
+  getTodos,
+  addTodo,
+  USER_ID,
+  deleteTodo,
+  updateTodo,
+} from './api/todos';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -36,6 +39,11 @@ export const App: React.FC = () => {
 
   const completedTodos = useMemo(
     () => todos.filter(todo => todo.completed).length,
+    [todos],
+  );
+
+  const allTodosCompleted = useMemo(
+    () => todos.every(todo => todo.completed),
     [todos],
   );
 
@@ -72,6 +80,34 @@ export const App: React.FC = () => {
     completedTodo.forEach(todo => onRemoveTodo(todo.id));
   };
 
+  const onUpdateTodo = async (todoToUpdate: Todo) => {
+    setLoadingTodo(prev => [...prev, todoToUpdate.id]);
+    try {
+      const updatedTodo = await updateTodo(todoToUpdate);
+      setTodos(prev =>
+        prev.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)),
+      );
+    } catch (err) {
+      setErrorMessage(Errors.UpdateTodo);
+      throw err;
+    } finally {
+      setLoadingTodo(prev => prev.filter(id => id !== todoToUpdate.id));
+    }
+  };
+
+  const onSelectAll = async () => {
+    if (unCompletedTodos > 0) {
+      const activeTodos = todos.filter(todo => !todo.completed);
+      activeTodos.forEach(todo => {
+        onUpdateTodo({ ...todo, completed: true });
+      });
+    } else {
+      todos.forEach(todo => {
+        onUpdateTodo({ ...todo, completed: false });
+      });
+    }
+  };
+
   useEffect(() => {
     getTodos()
       .then(setTodos)
@@ -87,27 +123,22 @@ export const App: React.FC = () => {
           onAddTodo={onAddTodo}
           setErrorMessage={setErrorMessage}
           tempTodo={tempTodo}
+          loadingTodo={loadingTodo}
+          onSelectAll={onSelectAll}
+          allTodosCompleted={allTodosCompleted}
+          todosLength={todos.length}
         />
 
-        {!!todos.length && (
+        {(!!todos.length || tempTodo) && (
           <>
-            <section className="todoapp_main" data-cy="TodoList">
-              {filteredTodos.map(todo => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  onRemoveTodo={onRemoveTodo}
-                  isLoading={loadingTodo.includes(todo.id)}
-                />
-              ))}
-              {tempTodo && (
-                <TodoItem
-                  todo={tempTodo}
-                  onRemoveTodo={onRemoveTodo}
-                  isLoading
-                />
-              )}
-            </section>
+            <TodoList
+              filteredTodos={filteredTodos}
+              loadingTodo={loadingTodo}
+              onRemoveTodo={onRemoveTodo}
+              onUpdateTodo={onUpdateTodo}
+              tempTodo={tempTodo}
+            />
+
             <TodoFooter
               status={status}
               setStatus={setStatus}

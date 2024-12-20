@@ -1,15 +1,28 @@
 import React, { Dispatch, useEffect, useRef, useState } from 'react';
 import { Errors } from '../types/ErrorType';
 import { Todo } from '../types/Todo';
+import cn from 'classnames';
 
 type Props = {
   onAddTodo: (value: string) => Promise<void>;
   setErrorMessage: Dispatch<React.SetStateAction<Errors>>;
   tempTodo: Todo | null;
+  loadingTodo: number[];
+  onSelectAll: () => Promise<void>;
+  allTodosCompleted: boolean;
+  todosLength: number;
 };
 
 export const TodoHeader: React.FC<Props> = props => {
-  const { onAddTodo, setErrorMessage, tempTodo } = props;
+  const {
+    onAddTodo,
+    setErrorMessage,
+    tempTodo,
+    loadingTodo,
+    onSelectAll,
+    allTodosCompleted,
+    todosLength,
+  } = props;
 
   const [inputValue, setInputValue] = useState('');
 
@@ -33,16 +46,18 @@ export const TodoHeader: React.FC<Props> = props => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [tempTodo, loadingTodo, todosLength]);
 
   return (
     <header className="todoapp__header">
-      {/* this button should have `active` class only if all todos are completed */}
-      <button
-        type="button"
-        className="todoapp__toggle-all active"
-        data-cy="ToggleAllButton"
-      />
+      {todosLength !== 0 && (
+        <button
+          type="button"
+          className={cn('todoapp__toggle-all', { active: allTodosCompleted })}
+          data-cy="ToggleAllButton"
+          onClick={onSelectAll}
+        />
+      )}
 
       <form onSubmit={onSubmit}>
         <input
