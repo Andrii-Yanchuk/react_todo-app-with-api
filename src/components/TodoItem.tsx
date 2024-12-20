@@ -27,6 +27,7 @@ export const TodoItem: React.FC<Props> = props => {
 
   const onSelectTodo = () => {
     const todoToUpdate = { ...todo, completed: !todo.completed };
+
     onUpdateTodo(todoToUpdate);
   };
 
@@ -43,10 +44,13 @@ export const TodoItem: React.FC<Props> = props => {
 
     if (todo.title === normalizedTitle) {
       setEditTodo(null);
+
       return;
     }
 
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
     try {
       if (normalizedTitle === '') {
@@ -71,6 +75,7 @@ export const TodoItem: React.FC<Props> = props => {
 
   return (
     <div data-cy="Todo" className={cn('todo', { completed: todo.completed })}>
+      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
       <label className="todo__status-label">
         <input
           data-cy="TodoStatus"

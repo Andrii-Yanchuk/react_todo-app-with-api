@@ -84,6 +84,7 @@ export const App: React.FC = () => {
     setLoadingTodo(prev => [...prev, todoToUpdate.id]);
     try {
       const updatedTodo = await updateTodo(todoToUpdate);
+
       setTodos(prev =>
         prev.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)),
       );
@@ -98,6 +99,7 @@ export const App: React.FC = () => {
   const onSelectAll = async () => {
     if (unCompletedTodos > 0) {
       const activeTodos = todos.filter(todo => !todo.completed);
+
       activeTodos.forEach(todo => {
         onUpdateTodo({ ...todo, completed: true });
       });
