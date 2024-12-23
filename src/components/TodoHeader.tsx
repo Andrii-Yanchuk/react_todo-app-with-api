@@ -50,7 +50,7 @@ export const TodoHeader: React.FC<Props> = props => {
 
   return (
     <header className="todoapp__header">
-      {todosLength !== 0 && (
+      {!!todosLength && (
         <button
           type="button"
           className={cn('todoapp__toggle-all', { active: allTodosCompleted })}

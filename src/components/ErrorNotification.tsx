@@ -1,10 +1,10 @@
-import React, { Dispatch, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import cn from 'classnames';
 import { Errors } from '../types/ErrorType';
 
 type Props = {
   errorMessage: string;
-  setErrorMessage: Dispatch<React.SetStateAction<Errors>>;
+  setErrorMessage: (error: Errors) => void;
 };
 
 export const ErrorNotification: React.FC<Props> = props => {

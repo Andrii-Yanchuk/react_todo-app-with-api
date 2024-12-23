@@ -5,7 +5,7 @@ import cn from 'classnames';
 type Props = {
   todo: Todo;
   isLoading?: boolean;
-  isInEditMode?: boolean;
+  isEditMode?: boolean;
   onUpdateTodo: (todo: Todo) => Promise<void>;
   onRemoveTodo: (todoId: number) => Promise<void>;
   setEditTodo: Dispatch<SetStateAction<null | number>>;
@@ -15,9 +15,9 @@ export const TodoItem: React.FC<Props> = props => {
   const {
     todo,
     isLoading,
-    onRemoveTodo,
+    isEditMode,
     onUpdateTodo,
-    isInEditMode,
+    onRemoveTodo,
     setEditTodo,
   } = props;
 
@@ -44,25 +44,19 @@ export const TodoItem: React.FC<Props> = props => {
 
     if (todo.title === normalizedTitle) {
       setEditTodo(null);
-
-      return;
-    }
-
-    if (isLoading) {
       return;
     }
 
     try {
-      if (normalizedTitle === '') {
+      if (!normalizedTitle.length) {
         await onRemoveTodo(todo.id);
       } else {
-        setNewTitle(normalizedTitle);
         await onUpdateTodo({ ...todo, title: normalizedTitle });
       }
 
       setEditTodo(null);
     } catch (err) {
-      inputRef?.current?.focus();
+      throw err;
     }
   };
 
@@ -86,7 +80,7 @@ export const TodoItem: React.FC<Props> = props => {
         />
       </label>
 
-      {isInEditMode ? (
+      {isEditMode ? (
         <form onSubmit={onSubmit} onBlur={onSubmit}>
           <input
             autoFocus
@@ -107,7 +101,7 @@ export const TodoItem: React.FC<Props> = props => {
             className="todo__title"
             onDoubleClick={onEditDoubleClick}
           >
-            {isLoading ? newTitle : todo.title}
+            {todo.title}
           </span>
           <button
             type="button"

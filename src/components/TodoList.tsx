@@ -25,10 +25,11 @@ export const TodoList: React.FC<Props> = props => {
           onRemoveTodo={onRemoveTodo}
           isLoading={loadingTodo.includes(todo.id)}
           onUpdateTodo={onUpdateTodo}
-          isInEditMode={editTodo === todo.id}
+          isEditMode={editTodo === todo.id}
           setEditTodo={setEditTodo}
         />
       ))}
+
       {tempTodo && (
         <TodoItem
           todo={tempTodo}
