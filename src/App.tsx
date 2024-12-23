@@ -68,7 +68,6 @@ export const App: React.FC = () => {
       setTodos(prev => prev.filter(todo => todo.id !== todoId));
     } catch (err) {
       setErrorMessage(Errors.DeleteTodo);
-      throw err;
     } finally {
       setLoadingTodo(prev => prev.filter(id => id !== todoId));
     }

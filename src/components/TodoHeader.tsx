@@ -30,7 +30,7 @@ export const TodoHeader: React.FC<Props> = props => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (inputValue.trim() === '') {
+    if (!inputValue.trim()) {
       setErrorMessage(Errors.EmptyTitle);
 
       return;
